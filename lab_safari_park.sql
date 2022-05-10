@@ -67,6 +67,8 @@ INSERT INTO assignments (day, fk_employee_id, fk_enclosure_id) VALUES ('Sunday',
 --SELECT * FROM animals;
 --SELECT * FROM assignments;
 
+-- The names of the animals in a given enclosure
+
 SELECT (animals.name) 
 FROM assignments
 INNER JOIN enclosures
@@ -77,6 +79,8 @@ INNER JOIN animals
 ON enclosures.id = animals.fk_enclosure_id
 WHERE enclosures.name = 'Reptiles';
 
+-- The names of the staff working in a given enclosure
+
 SELECT (staff.name) 
 FROM assignments
 INNER JOIN enclosures
@@ -85,5 +89,66 @@ INNER JOIN staff
 ON assignments.fk_employee_id = staff.id
 INNER JOIN animals
 ON enclosures.id = animals.fk_enclosure_id
-WHERE enclosures.name = 'Primates';                                                       
-  
+WHERE enclosures.name = 'Primates';
+
+--The names of staff working in enclosures which are closed for maintenance
+
+SELECT (staff.name) 
+FROM assignments
+INNER JOIN enclosures
+ON assignments.fk_enclosure_id = enclosures.id 
+INNER JOIN staff
+ON assignments.fk_employee_id = staff.id
+INNER JOIN animals
+ON enclosures.id = animals.fk_enclosure_id
+WHERE enclosures.closedForMaintenance = TRUE;
+
+--The name of the enclosure where the oldest animal lives. If there are two animals who are the same age choose the first one alphabetically.
+
+SELECT (enclosures.name) 
+FROM assignments
+INNER JOIN enclosures
+ON assignments.fk_enclosure_id = enclosures.id 
+INNER JOIN staff
+ON assignments.fk_employee_id = staff.id
+INNER JOIN animals
+ON enclosures.id = animals.fk_enclosure_id
+WHERE animals.age = (SELECT MAX(age) FROM animals);
+
+--The number of different animal types a given keeper has been assigned to work with.
+
+SELECT COUNT(DISTINCT animals.type)
+FROM assignments
+INNER JOIN enclosures
+ON assignments.fk_enclosure_id = enclosures.id 
+INNER JOIN staff
+ON assignments.fk_employee_id = staff.id
+INNER JOIN animals
+ON enclosures.id = animals.fk_enclosure_id
+WHERE staff.name = 'Amber';
+
+
+--The number of different keepers who have been assigned to work in a given enclosure
+
+SELECT COUNT(DISTINCT staff.name) 
+FROM assignments
+INNER JOIN enclosures
+ON assignments.fk_enclosure_id = enclosures.id 
+INNER JOIN staff
+ON assignments.fk_employee_id = staff.id
+INNER JOIN animals
+ON enclosures.id = animals.fk_enclosure_id
+WHERE enclosures.name = 'Birds';
+
+
+--The names of the other animals sharing an enclosure with a given animal (eg. find the names of all the animals sharing the big cat field with Tony)
+
+SELECT (animals.name) 
+FROM assignments
+INNER JOIN enclosures
+ON assignments.fk_enclosure_id = enclosures.id 
+INNER JOIN staff
+ON assignments.fk_employee_id = staff.id
+INNER JOIN animals
+ON enclosures.id = animals.fk_enclosure_id
+WHERE enclosures.id = (SELECT fk_enclosure_id FROM animals WHERE name = 'Harambe');
